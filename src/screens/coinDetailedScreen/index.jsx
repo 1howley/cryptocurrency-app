@@ -1,43 +1,69 @@
-import React, { useState } from "react";
-import { View, Text, TextInput } from "react-native";
-import Coin from "../../../assets/data/crypto.json";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, ActivityIndicator } from "react-native";
 import CoinDetailedHeader from "./components/coinDetailedHeader";
 import styles from "./styles";
 import { AntDesign } from '@expo/vector-icons';
 import CoinDetailedChart from "./components/coinDetailedChart";
+import { useRoute } from "@react-navigation/native";
+import { getDetailedCoindData, getMarketChart } from "../../services/requests";
 
 const CoinDetailedScreen = () => {
+
+    const [coinValue, setCoinValue] = useState("1")
+    const [coin, setCoin] = useState(null)
+    const [coinMarketData, setCoinMarketData] = useState(null)
+    const [loading, setLoading] = useState(false) 
+    const [usdValue, setUsdValue] = useState("")
+
+
+    const chanceCoinValue = (value) => {
+
+        setCoinValue(value)
+        const floatValue = parseFloat(value.replace(',', '.')) || 0;
+        setUsdValue((floatValue * current_price.usd).toString())
+
+    }
+    const chanceUsdValue = (value) => {
+
+        setUsdValue(value)
+        const floatValue = parseFloat(value.replace(',', '.')) || 0;
+        setCoinValue((floatValue / current_price.usd).toString())
+
+    }
+
+    const route = useRoute();
+    const { params: { coinId } } = route
+
+    const fetchCoinData = async () => {
+        setLoading(true)
+        const fetchedCoinData = await getDetailedCoindData(coinId)
+        const fetchedMarketData = await getMarketChart(coinId)
+        setCoinMarketData(fetchedMarketData)
+        setCoin(fetchedCoinData)
+        setUsdValue(fetchedCoinData.market_data.current_price.usd.toString())
+        setLoading(false)
+    }
+
+    useEffect(() => {
+        fetchCoinData()
+    }, [])
+    
+    if (loading || !coin || !coinMarketData) {
+        return <ActivityIndicator size='large'/>
+    }
 
     const {
         image: { small },
         name,
         symbol,
-        prices,
         market_data: {
             market_cap_rank,
             current_price,
             price_change_percentage_24h
         }
-    } = Coin;
+    } = coin;
 
-    const [coinValue, setCoinValue] = useState("1")
-    const [usdValue, setUsdValue] = useState(current_price.usd.toString())
-
-    const chanceCoinValue = (value) => {
-
-        setCoinValue(value)
-        const floatValue = parseFloat(value.replace(',' , '.')) || 0;
-        setUsdValue((floatValue * current_price.usd).toString())
-
-    }
-    const chanceUsdValue = (value) => {
-        
-        setUsdValue(value)
-        const floatValue = parseFloat(value.replace(',' , '.')) || 0;
-        setCoinValue((floatValue / current_price.usd).toString())
-
-    }
-
+    const { prices } = coinMarketData
     const percentageColor = price_change_percentage_24h < 0 ? '#ea3943' : '#16c784'
 
     return (
@@ -67,9 +93,9 @@ const CoinDetailedScreen = () => {
 
                 <View style={{ flexDirection: 'row', flex: 1 }}>
                     <Text style={{ color: 'white', alignSelf: 'center' }}>{symbol.toUpperCase()}</Text>
-                    <TextInput 
-                        style={styles.input} 
-                        value={coinValue} 
+                    <TextInput
+                        style={styles.input}
+                        value={coinValue}
                         keyboardType="numeric"
                         onChangeText={chanceCoinValue}
                     />
@@ -77,9 +103,9 @@ const CoinDetailedScreen = () => {
 
                 <View style={{ flexDirection: 'row', flex: 1 }}>
                     <Text style={{ color: 'white', alignSelf: 'center' }}>USD</Text>
-                    <TextInput 
-                        style={styles.input} 
-                        value={usdValue} 
+                    <TextInput
+                        style={styles.input}
+                        value={usdValue}
                         keyboardType="numeric"
                         onChangeText={chanceUsdValue}
                     />

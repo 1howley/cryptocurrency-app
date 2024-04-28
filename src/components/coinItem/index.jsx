@@ -1,21 +1,25 @@
 import React from "react";
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, Pressable } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import styles from "./styles";
+import { useNavigation } from "@react-navigation/native";
 
 const CoinItem = ({ marketCoin }) => {
 
-    const { 
-        name, 
+    const {
+        id,
+        name,
         current_price,
-        market_cap_rank, 
-        price_change_percentage_24h, 
-        symbol, 
+        market_cap_rank,
+        price_change_percentage_24h,
+        symbol,
         market_cap,
         image,
     } = marketCoin;
 
-    const porcentageColor = price_change_percentage_24h < 0? '#ea3943': '#16c784'
+    const navigation = useNavigation();
+
+    const porcentageColor = price_change_percentage_24h < 0 ? '#ea3943' : '#16c784'
 
     const normalizeMarketCap = (marketCap) => {
         if (marketCap > 1_000_000_000_000) {
@@ -26,15 +30,18 @@ const CoinItem = ({ marketCoin }) => {
             return `${Math.floor(marketCap / 1_000_000)} M`
         } if (marketCap > 1_000) {
             return `${Math.floor(marketCap / 1_000)} K`
-        } 
+        }
 
         return marketCap
     }
 
     return (
-        <View style={styles.coinContainer}>
+        <Pressable
+            style={styles.coinContainer}
+            onPress={() => navigation.navigate("CoinDetailedScreen", {coinId: id})}
+        >
             <Image
-                src = { image }
+                src={image}
                 style={{ height: 30, width: 30, marginRight: 10, alignSelf: 'center' }}
             />
             <View>
@@ -43,19 +50,19 @@ const CoinItem = ({ marketCoin }) => {
                     <Text style={styles.rank}>{market_cap_rank}</Text>
                     <Text style={styles.text}>{symbol.toUpperCase()}</Text>
                     <AntDesign
-                        name={price_change_percentage_24h < 0? 'caretdown': 'caretup'}
+                        name={price_change_percentage_24h < 0 ? 'caretdown' : 'caretup'}
                         size={12}
                         color={porcentageColor}
                         style={{ alignSelf: 'center', marginRight: 3 }}
                     />
-                    <Text style={{ color: porcentageColor}}>{price_change_percentage_24h.toFixed(2)}%</Text>
+                    <Text style={{ color: porcentageColor }}>{price_change_percentage_24h.toFixed(2)}%</Text>
                 </View>
             </View>
-            <View style={{ marginLeft: 'auto', alignItems: 'flex-end'}}>
+            <View style={{ marginLeft: 'auto', alignItems: 'flex-end' }}>
                 <Text style={styles.title}>{current_price}</Text>
-                <Text style={{color: 'white'}}>MCap {normalizeMarketCap(market_cap)}</Text>
+                <Text style={{ color: 'white' }}>MCap {normalizeMarketCap(market_cap)}</Text>
             </View>
-        </View>
+        </Pressable>
     )
 }
 
