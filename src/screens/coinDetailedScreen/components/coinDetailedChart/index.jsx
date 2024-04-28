@@ -12,12 +12,12 @@ const CoinDetailedChart = (props) => {
     const screenWidth = Dimensions.get('window').width
 
     return (
-        <GestureHandlerRootView >
+        <GestureHandlerRootView>
 
-            <LineChart.Provider data={prices.map(([timestamp, value]) => ({ timestamp, value }))} >
-                <LineChart width={screenWidth - 10}>
-                    <LineChart.Path inactiveColor="white" color={percentageColor} width={2} animateOnMount="foreground"/>
-                    <LineChart.CursorCrosshair color="white">
+            <LineChart.Provider data={prices.map(([timestamp, value]) => ({ timestamp, value }))}>
+                <LineChart width={screenWidth - 10} height={200}>
+                    <LineChart.Path color={percentageColor} width={2} animateOnMount="foreground"/>
+                    <LineChart.CursorCrosshair color={percentageColor}>
                         <LineChart.Tooltip textStyle={{
                             backgroundColor: 'black',
                             borderRadius: 4,

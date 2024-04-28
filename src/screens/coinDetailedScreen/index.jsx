@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Dimensions } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput } from "react-native";
 import Coin from "../../../assets/data/crypto.json";
 import CoinDetailedHeader from "./components/coinDetailedHeader";
 import styles from "./styles";
@@ -20,12 +20,28 @@ const CoinDetailedScreen = () => {
         }
     } = Coin;
 
+    const [coinValue, setCoinValue] = useState("1")
+    const [usdValue, setUsdValue] = useState(current_price.usd.toString())
+
+    const chanceCoinValue = (value) => {
+
+        setCoinValue(value)
+        const floatValue = parseFloat(value.replace(',' , '.')) || 0;
+        setUsdValue((floatValue * current_price.usd).toString())
+
+    }
+    const chanceUsdValue = (value) => {
+        
+        setUsdValue(value)
+        const floatValue = parseFloat(value.replace(',' , '.')) || 0;
+        setCoinValue((floatValue / current_price.usd).toString())
+
+    }
+
     const percentageColor = price_change_percentage_24h < 0 ? '#ea3943' : '#16c784'
 
-    const screenWidth = Dimensions.get('window').width
-
     return (
-        <View style={{ paddingHorizontal: 10}}>
+        <View style={{ paddingHorizontal: 10 }}>
             <CoinDetailedHeader
                 image={small}
                 symbol={symbol}
@@ -46,7 +62,30 @@ const CoinDetailedScreen = () => {
                     <Text style={styles.priceChange}>{price_change_percentage_24h.toFixed(2)}%</Text>
                 </View>
             </View>
-            <CoinDetailedChart prices={prices} pricePercent={price_change_percentage_24h}/>
+            <CoinDetailedChart prices={prices} pricePercent={price_change_percentage_24h} />
+            <View style={{ flexDirection: 'row' }}>
+
+                <View style={{ flexDirection: 'row', flex: 1 }}>
+                    <Text style={{ color: 'white', alignSelf: 'center' }}>{symbol.toUpperCase()}</Text>
+                    <TextInput 
+                        style={styles.input} 
+                        value={coinValue} 
+                        keyboardType="numeric"
+                        onChangeText={chanceCoinValue}
+                    />
+                </View>
+
+                <View style={{ flexDirection: 'row', flex: 1 }}>
+                    <Text style={{ color: 'white', alignSelf: 'center' }}>USD</Text>
+                    <TextInput 
+                        style={styles.input} 
+                        value={usdValue} 
+                        keyboardType="numeric"
+                        onChangeText={chanceUsdValue}
+                    />
+                </View>
+
+            </View>
         </View>
     );
 
