@@ -4,6 +4,7 @@ import { COINGECKO_KEY } from '@env'
 export const getDetailedCoindData = async (coinId) => {
     
     try {
+        console.log(COINGECKO_KEY);
         const url = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=true&market_data=true&community_data=false&developer_data=false&sparkline=false`;
         const options = {
             headers: {
